@@ -1,0 +1,25 @@
+﻿# Windows/AppData - NÃO sincronizar
+AppData/
+vault/
+node_modules/
+.obsidian/
+Memory/
+Downloads/
+Desktop/
+Documents/
+Pictures/
+Music/
+Videos/
+OneDrive/
+Saved Games/
+Searches/
+Contacts/
+Favorites/
+Links/
+.git/
+.DS_Store
+*.tmp
+*.log
+fabia-sync.log
+**/NTUSER.DAT*
+**/ntuser.*
