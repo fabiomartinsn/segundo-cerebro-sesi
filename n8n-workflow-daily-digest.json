@@ -1,0 +1,56 @@
+{
+  "name": "FabIA - Daily Digest",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger-1",
+      "name": "Todo dia às 8h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { exec } = require('child_process');\nconst fs = require('fs');\n\nfunction runCommand(cmd, opts) {\n  return new Promise((resolve, reject) => {\n    exec(cmd, opts, (error, stdout, stderr) => {\n      if (error) { reject(new Error(error.message + ' | stderr: ' + stderr)); return; }\n      resolve(stdout);\n    });\n  });\n}\n\nlet output;\ntry {\n  output = await runCommand('claude --print \"/daily-briefing\"', {\n    cwd: 'D:\\\\segundo-cerebro',\n    maxBuffer: 20 * 1024 * 1024,\n    timeout: 5 * 60 * 1000\n  });\n} catch (err) {\n  return [{ json: { erro: true, mensagem: err.message } }];\n}\n\nconst destino = `D:\\\\segundo-cerebro\\\\vault\\\\_sessions\\\\last-daily-digest-output.txt`;\nfs.writeFileSync(destino, output, 'utf8');\n\nreturn [{ json: { salvo_em: destino, tamanho: output.length } }];\n"
+      },
+      "id": "code-daily-briefing",
+      "name": "Rodar /daily-briefing e salvar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ],
+      "notes": "Placeholder: hoje só salva em arquivo texto. Quando tiver contatos reais da equipe, complementar com envio real (Email, Telegram, WhatsApp etc.)"
+    }
+  ],
+  "connections": {
+    "Todo dia às 8h": {
+      "main": [
+        [
+          {
+            "node": "Rodar /daily-briefing e salvar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

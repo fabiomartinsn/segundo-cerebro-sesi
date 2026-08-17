@@ -1,0 +1,138 @@
+{
+  "name": "FabIA - Urgent Watcher",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger-2",
+      "name": "A cada 15 minutos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const { exec } = require('child_process');\n\nfunction runCommand(cmd, opts) {\n  return new Promise((resolve, reject) => {\n    exec(cmd, opts, (error, stdout, stderr) => {\n      if (error) { reject(new Error(error.message + ' | stderr: ' + stderr)); return; }\n      resolve(stdout);\n    });\n  });\n}\n\nlet output;\ntry {\n  output = await runCommand('node check-urgentes.js 15', {\n    cwd: 'D:\\\\segundo-cerebro',\n    maxBuffer: 10 * 1024 * 1024,\n    timeout: 2 * 60 * 1000\n  });\n} catch (err) {\n  return [{ json: { erro: true, mensagem: err.message, total_urgentes: 0, urgentes: [] } }];\n}\n\nconst parsed = JSON.parse(output);\nreturn [{ json: parsed }];\n"
+      },
+      "id": "code-check-urgentes",
+      "name": "Checar mensagens Urgentes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-1",
+              "leftValue": "={{ $json.total_urgentes }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "if-has-urgent",
+      "name": "Tem mensagem Urgente?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        740,
+        300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "noop-notify",
+      "name": "Notificar (configurar depois)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        980,
+        220
+      ],
+      "notes": "Placeholder: quando tiver contatos reais, trocar por Email/Telegram/WhatsApp usando $json.urgentes."
+    },
+    {
+      "parameters": {},
+      "id": "noop-nothing",
+      "name": "Nada a fazer",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        980,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "A cada 15 minutos": {
+      "main": [
+        [
+          {
+            "node": "Checar mensagens Urgentes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Checar mensagens Urgentes": {
+      "main": [
+        [
+          {
+            "node": "Tem mensagem Urgente?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tem mensagem Urgente?": {
+      "main": [
+        [
+          {
+            "node": "Notificar (configurar depois)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Nada a fazer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
