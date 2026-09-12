@@ -20,7 +20,8 @@ const JIDS_VIP_SESI = new Set([
 ]);
 
 // ─── FabIA Agente44 — documentos e resultados gerados via Base44 ─────────────
-const FABIA_AGENTE_JID = '19516668518@s.whatsapp.net';
+// JID real capturado via [DIAG-JID]: @lid (não @s.whatsapp.net)
+const FABIA_AGENTE_JID = '73204127244465@lid';
 
 // ─── Classificação por ASSUNTO (SESI / Senai / Particular / Diversos) ─────────
 const TERMOS_SESI = [
@@ -428,9 +429,6 @@ async function processLote(messages, config) {
 
             const flag = isFabiaAgente ? '[FabIA] ' : (urgente ? '[URGENTE] ' : (assunto === 'SESI' || assunto === 'Senai' ? `[${assunto}] ` : '[MSG] '));
             log(`${flag}${dateStr} ${timeStr} [${groupName || dirName}] ${msg.push_name || '?'} (${assunto}/${prioridade}): ${String(content).substring(0, 80)}`);
-            if ((msg.push_name || '').toLowerCase().includes('zapia') && !isFabiaAgente) {
-                log(`[DIAG-JID] ZapIA remote_jid="${jid}" — esperado="${FABIA_AGENTE_JID}" — MATCH=${jid === FABIA_AGENTE_JID}`);
-            }
             criados++;
             idsProcessados.push(msg.id);
 
