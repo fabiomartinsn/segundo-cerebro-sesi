@@ -8,8 +8,30 @@ Gere o briefing completo do dia seguindo rigorosamente a estrutura abaixo.
 - `vault/_contextos/_INDEX.md`
 - Os 3 arquivos mais recentes de `vault/_sessions/`
 - Os 3 arquivos mais recentes de `vault/_decisions/`
+- `vault/_knowledge/SESI/Planejamento/grade-semanal-sst-cruzamento.md`
 
 Use apenas dados reais dos arquivos. Se uma pasta estiver vazia, escreva "Nenhum registro ainda".
+
+---
+
+## Grade Semanal — Base do Foco Diário
+
+Antes de gerar o Foco de Hoje, determine o bloco ativo do dia:
+
+| Dia | Bloco padrão |
+|---|---|
+| Segunda | GESTÃO (07–09h) + TÉCNICO (09–16h) |
+| Terça | TÉCNICO (dia inteiro) |
+| Quarta | Verificar agenda — visita: **CAMPO** (dia inteiro) · sem visita: **TÉCNICO** |
+| Quinta | TÉCNICO (07–12h) + ADMIN (13–14h) + TÉCNICO (14–16h) |
+| Sexta | Verificar agenda — visita: **CAMPO** (dia inteiro) · sem visita: **FECHAMENTO/RELATÓRIOS** |
+
+**Regras de sobreposição:**
+- Se houver visita técnica agendada na agenda (arquivo `_pipeline/agenda-ago-set-2026.md` ou memória): bloco vira CAMPO independente do dia
+- Semana com eventos externos (viagem, evento nacional): indicar ausência e ajustar foco para dias disponíveis
+- Suporte GRM: nunca é bloco fixo — aparece em Foco apenas se Ramon acionou ou há demanda aberta
+
+O bloco determina o conteúdo das 3 prioridades do Foco de Hoje e o tom do Panorama.
 
 **IMPORTANTE:** JFX/EDISER/Petrobras é contexto encerrado (19/07/2026). NÃO incluir no briefing seções de JFX, EDISER, Gestão SMS, equipe EDISER (Sheila/Roberta/Fernando/Lucimara), cobertura PEX/APR, ou qualquer ação relacionada. Essas informações existem no vault para consulta histórica/decisória, mas não geram ações no briefing diário.
 
@@ -42,7 +64,13 @@ Ignore mensagens administrativas/sociais óbvias (figurinhas, "bom dia", "ok", c
 - `vault/WhatsApp/diretos/Luis Paulo/` — Secretário da Presidência FIES (+5579999292756)
 - `vault/WhatsApp/diretos/Luiz Carlos/` — alias antigo de Luis Paulo (histórico anterior ao mapeamento JID)
 
-Qualquer mensagem desses contatos hoje deve aparecer em destaque 🔴 na seção SESI, mesmo que o frontmatter `assunto` diga outra coisa (mensagens anteriores ao fix de classificação).
+**Grupo VIP CRÍTICO — monitoramento obrigatório:**
+- `vault/WhatsApp/grupos/Gestores SST/` — grupo de gestores SST #Gestor #SESI
+- Qualquer arquivo nesta pasta hoje → destacar com 🔴 no topo da seção SESI, com formato: `🔴 hh:mm [GESTORES S&S] Contato: resumo`
+- Anexos/documentos deste grupo → listar também em "📄 PDFs recebidos hoje" mesmo se já apareceu em SESI
+- Se a pasta não existir ainda, escrever: "⚠️ Grupo 'Gestores SST' sem mensagens sincronizadas hoje"
+
+Qualquer mensagem dos contatos VIP ou do grupo crítico deve aparecer em destaque 🔴 na seção SESI, mesmo que o frontmatter `assunto` diga outra coisa (mensagens anteriores ao fix de classificação).
 
 ---
 
@@ -53,7 +81,8 @@ Gere o briefing com exatamente este formato:
 > FabIA · Fábio Martins Nascimento
 
 ## Panorama
-[2 linhas: como está a semana e o que domina a agenda hoje]
+[Linha 1: bloco do dia (ex: "Dia técnico — foco em elaboração de documentos") + se há visita ou ausência]
+[Linha 2: o que está aberto e urgente no radar SESI]
 
 ---
 
@@ -86,6 +115,9 @@ Gere o briefing com exatamente este formato:
 ### Senai
 [mesmo formato, ou "Nenhuma mensagem nova hoje"]
 
+### Perícia
+[mesmo formato, ou "Nenhuma mensagem nova hoje"]
+
 ### Particular
 [mesmo formato, ou "Nenhuma mensagem nova hoje"]
 
@@ -107,13 +139,21 @@ Gere o briefing com exatamente este formato:
 
 ---
 
+## 🤝 Rotina de Equipe
+- [ ] Contatar equipe SST — bom dia / alinhamento do dia (WhatsApp ou presencial)
+  Sugestão: [gerar 1 mensagem curta e direta para enviar à equipe com o foco do dia]
+
 ## 🎯 Foco de Hoje
-1. [prioridade absoluta — seja específico e acionável]
+> Bloco: [GESTÃO + TÉCNICO / TÉCNICO / CAMPO / ADMIN+TÉCNICO / FECHAMENTO — conforme dia e agenda]
+1. [prioridade específica para o bloco ativo — seja concreto: documento, cliente, sistema]
 2. [prioridade 2]
 3. [prioridade 3]
 
 ## ⚠️ Alertas Gerais
-[prazo iminente, bloqueio, conexão crítica entre contextos, ou pendência Urgente do WhatsApp sem resposta — ou "Nenhum alerta"]
+
+**Antes de gerar esta seção:** leia todos os arquivos `.md` em `vault/_alerts/` com `status: pendente`. Cada um vira um item de alerta aqui, com ícone ⚠️ e o conteúdo resumido em 1–2 linhas. Se não houver arquivos com status pendente, escreva apenas os alertas derivados do restante do briefing.
+
+[prazo iminente, bloqueio, conexão crítica entre contextos, pendência Urgente do WhatsApp sem resposta, ou alertas ativos de vault/_alerts/ — ou "Nenhum alerta"]
 ```
 
 ---
@@ -125,4 +165,5 @@ formatado para impressão A4, com:
 - Seções SESI / Perícia / Dev-IA / Diversos / WhatsApp com bordas visuais por contexto
 - Alertas em vermelho / urgentes em laranja / OK em verde
 - CSS print-friendly (sem backgrounds escuros, fonte 11pt, margens 1.5cm)
+- Seção "🤝 Rotina de Equipe": caixa com borda esquerda verde (`#2E7D32`), fundo `#F1F8E9`, checkbox visual `☐`, mensagem sugerida em itálico com fundo branco e borda tracejada
 - Rodapé: "Fábio Martins Nascimento · CREA-SE 2718664207"

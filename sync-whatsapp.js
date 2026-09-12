@@ -13,10 +13,14 @@ const B44_URL = 'https://app.base44.com/api/apps/69b1d93deb1522c6e94d1afd/entiti
 const B44_KEY = '877ba859cb474de4967f421a336165c9';
 
 // ─── Contatos VIP — sempre SESI + Urgente independente do conteúdo ──────────
+// JIDs adicionais carregados de _GRUPOS.md ## JIDs VIP são merged aqui em runtime
 const JIDS_VIP_SESI = new Set([
     '5579999217120@s.whatsapp.net', // Ivonete Almeida — Gerente RH FIES
     '5579999292756@s.whatsapp.net', // Luis Paulo — Secretário da Presidência FIES
 ]);
+
+// ─── FabIA Agente44 — documentos e resultados gerados via Base44 ─────────────
+const FABIA_AGENTE_JID = '19516668518@s.whatsapp.net';
 
 // ─── Classificação por ASSUNTO (SESI / Senai / Particular / Diversos) ─────────
 const TERMOS_SESI = [
@@ -50,19 +54,27 @@ function isGrupo(jid) {
     return !!jid && jid.includes('@g.us');
 }
 
-function classificarAssunto(texto, jid) {
-    if (JIDS_VIP_SESI.has(jid))                return 'SESI';
-    if (contemAlgumTermo(texto, TERMOS_SESI))  return 'SESI';
-    if (contemAlgumTermo(texto, TERMOS_SENAI)) return 'Senai';
+function classificarAssunto(texto, jid, isGrupoAlta, pushName, contatosSesiSet, contatosPericiaSet, jidsSesiSet) {
+    if (jid === FABIA_AGENTE_JID)                             return 'FabIA';
+    if (isGrupoAlta)                                          return 'SESI';
+    if (JIDS_VIP_SESI.has(jid))                              return 'SESI';
+    if (jidsSesiSet.has(jid))                                return 'SESI';
+    if (isContatoSesi(pushName, contatosSesiSet))             return 'SESI';
+    if (isContatoPericia(pushName, contatosPericiaSet))       return 'Pericia';
+    if (contemAlgumTermo(texto, TERMOS_SESI))                 return 'SESI';
+    if (contemAlgumTermo(texto, TERMOS_SENAI))                return 'Senai';
     if (!isGrupo(jid)) return 'Particular';
     return 'Diversos';
 }
 
-function classificarPrioridade(texto, pushName, assunto, altaSet, jid) {
-    if (JIDS_VIP_SESI.has(jid))                       return 'Urgente';
-    if (contemAlgumTermo(texto, TERMOS_URGENCIA))      return 'Urgente';
-    if (isAlta(pushName, altaSet))                     return 'Urgente';
-    if (assunto === 'SESI' || assunto === 'Senai')     return 'Prioridade';
+function classificarPrioridade(texto, pushName, assunto, altaSet, jid, isGrupoAlta, jidsSesiSet) {
+    if (jid === FABIA_AGENTE_JID)                             return 'Urgente';
+    if (isGrupoAlta)                                          return 'Urgente';
+    if (JIDS_VIP_SESI.has(jid))                              return 'Urgente';
+    if (contemAlgumTermo(texto, TERMOS_URGENCIA))             return 'Urgente';
+    if (isAlta(pushName, altaSet))                            return 'Urgente';
+    if (jidsSesiSet.has(jid))                                 return 'Prioridade';
+    if (assunto === 'SESI' || assunto === 'Senai')            return 'Prioridade';
     return 'Normal';
 }
 
@@ -76,16 +88,21 @@ function log(msg) {
 function sanitizeName(name) {
     if (!name) return 'desconhecido';
     return name
+        .replace(/[\r\n]+/g, ' ')
         .replace(/[^\w\s\-áàãâéêíóôõúçÁÀÃÂÉÊÍÓÔÕÚÇ]/gu, '_')
         .replace(/_{2,}/g, '_')
         .replace(/^_+|_+$/g, '')
+        .trim()
         || 'desconhecido';
 }
 
 // ─── Carrega config de grupos ─────────────────────────────────────────────────
 function loadConfig() {
     const grupos = {}, diretos = {}, altaSet = new Set(), propioSet = new Set();
-    if (!fs.existsSync(GRUPOS_FILE)) return { grupos, diretos, altaSet, propioSet };
+    const gruposAltaJids = new Set(), gruposAltaNomes = new Set();
+    const contatosSesiSet = new Set(), contatosPericiaSet = new Set();
+    const jidsSesiSet = new Set(), jidsVipExtra = new Set();
+    if (!fs.existsSync(GRUPOS_FILE)) return { grupos, diretos, altaSet, propioSet, gruposAltaJids, gruposAltaNomes, contatosSesiSet, contatosPericiaSet, jidsSesiSet, jidsVipExtra };
 
     const lines = fs.readFileSync(GRUPOS_FILE, 'utf8').split('\n');
     let secao = null;
@@ -93,11 +110,16 @@ function loadConfig() {
     for (const line of lines) {
         const t = line.trim();
 
-        if (t.startsWith('## Grupos'))           { secao = 'grupos';  continue; }
-        if (t.startsWith('## Chats Diretos'))    { secao = 'diretos'; continue; }
-        if (t.startsWith('## Contatos ALTA'))    { secao = 'alta';    continue; }
-        if (t.startsWith('## Identidade'))       { secao = 'proprio'; continue; }
-        if (t.startsWith('##'))                  { secao = null;      continue; }
+        if (t.startsWith('## Grupos ALTA'))      { secao = 'gruposalta'; continue; }
+        if (t.startsWith('## Grupos'))           { secao = 'grupos';     continue; }
+        if (t.startsWith('## Chats Diretos'))    { secao = 'diretos';    continue; }
+        if (t.startsWith('## JIDs VIP'))         { secao = 'jidsvip';    continue; }
+        if (t.startsWith('## JIDs SESI'))        { secao = 'jidssesi';   continue; }
+        if (t.startsWith('## Contatos ALTA'))    { secao = 'alta';       continue; }
+        if (t.startsWith('## Contatos SESI'))    { secao = 'sesi';       continue; }
+        if (t.startsWith('## Contatos Pericia')) { secao = 'pericia';    continue; }
+        if (t.startsWith('## Identidade'))       { secao = 'proprio';    continue; }
+        if (t.startsWith('##'))                  { secao = null;         continue; }
 
         if ((secao === 'grupos' || secao === 'diretos') && t.startsWith('|')) {
             const parts = t.split('|').map(p => p.trim()).filter(Boolean);
@@ -109,16 +131,44 @@ function loadConfig() {
             }
         }
 
+        if (secao === 'gruposalta' && t.startsWith('|')) {
+            const parts = t.split('|').map(p => p.trim()).filter(Boolean);
+            if (parts.length >= 2) {
+                const jid  = parts[0];
+                const nome = parts[1];
+                if (jid.includes('@')) gruposAltaJids.add(jid);
+                gruposAltaNomes.add(nome.toLowerCase());
+            } else if (parts.length === 1) {
+                gruposAltaNomes.add(parts[0].toLowerCase());
+            }
+        }
+
         if (secao === 'alta') {
             const m = t.match(/^-\s+(.+)/);
             if (m) altaSet.add(m[1].trim().toLowerCase());
+        }
+        if (secao === 'jidsvip' && t.startsWith('|')) {
+            const parts = t.split('|').map(p => p.trim()).filter(Boolean);
+            if (parts.length >= 1 && parts[0].includes('@')) jidsVipExtra.add(parts[0]);
+        }
+        if (secao === 'jidssesi' && t.startsWith('|')) {
+            const parts = t.split('|').map(p => p.trim()).filter(Boolean);
+            if (parts.length >= 1 && parts[0].includes('@')) jidsSesiSet.add(parts[0]);
+        }
+        if (secao === 'sesi') {
+            const m = t.match(/^-\s+(.+)/);
+            if (m) contatosSesiSet.add(m[1].trim().toLowerCase());
+        }
+        if (secao === 'pericia') {
+            const m = t.match(/^-\s+(.+)/);
+            if (m) contatosPericiaSet.add(m[1].trim().toLowerCase());
         }
         if (secao === 'proprio') {
             const m = t.match(/^-\s+(.+)/);
             if (m) propioSet.add(m[1].trim().toLowerCase());
         }
     }
-    return { grupos, diretos, altaSet, propioSet };
+    return { grupos, diretos, altaSet, propioSet, gruposAltaJids, gruposAltaNomes, contatosSesiSet, contatosPericiaSet, jidsSesiSet, jidsVipExtra };
 }
 
 // ─── Detecta se contato é ALTA ────────────────────────────────────────────────
@@ -127,6 +177,26 @@ function isAlta(pushName, altaSet) {
     const lc = pushName.toLowerCase();
     for (const a of altaSet) {
         if (lc.includes(a) || a.includes(lc.split(' ')[0])) return true;
+    }
+    return false;
+}
+
+// ─── Detecta contato SESI por push_name ──────────────────────────────────────
+function isContatoSesi(pushName, contatosSesiSet) {
+    if (!pushName) return false;
+    const lc = pushName.toLowerCase();
+    for (const s of contatosSesiSet) {
+        if (lc.includes(s) || s.includes(lc.split(' ')[0])) return true;
+    }
+    return false;
+}
+
+// ─── Detecta contato Perícia por push_name ───────────────────────────────────
+function isContatoPericia(pushName, contatosPericiaSet) {
+    if (!pushName) return false;
+    const lc = pushName.toLowerCase();
+    for (const p of contatosPericiaSet) {
+        if (lc.includes(p) || p.includes(lc.split(' ')[0])) return true;
     }
     return false;
 }
@@ -281,7 +351,7 @@ function resolveMediaLabel(messageType) {
 
 // ─── Processa um lote de mensagens ───────────────────────────────────────────
 async function processLote(messages, config) {
-    const { grupos, diretos, altaSet, propioSet } = config;
+    const { grupos, diretos, altaSet, propioSet, gruposAltaJids, gruposAltaNomes, contatosSesiSet, contatosPericiaSet, jidsSesiSet } = config;
     let criados = 0, pulados = 0, midias = 0;
     const idsProcessados = [];
     const checkinFeito = new Set();  // evita múltiplas chamadas Base44 por pessoa por lote
@@ -290,8 +360,9 @@ async function processLote(messages, config) {
         try {
             const jid       = msg.remote_jid || '';
             const groupName = grupos[jid] || diretos[jid] || null;
-            const assunto    = classificarAssunto(msg.content, jid);
-            const prioridade = classificarPrioridade(msg.content, msg.push_name, assunto, altaSet, jid);
+            const isGrupoAlta = gruposAltaJids.has(jid) || (groupName && gruposAltaNomes.has(groupName.toLowerCase()));
+            const assunto    = classificarAssunto(msg.content, jid, isGrupoAlta, msg.push_name, contatosSesiSet, contatosPericiaSet, jidsSesiSet);
+            const prioridade = classificarPrioridade(msg.content, msg.push_name, assunto, altaSet, jid, isGrupoAlta, jidsSesiSet);
             const urgente    = prioridade === 'Urgente';
 
             const dirName  = groupName
@@ -336,23 +407,30 @@ async function processLote(messages, config) {
             }
 
             // Frontmatter Obsidian
+            const isFabiaAgente = jid === FABIA_AGENTE_JID;
+            const tagsExtra = isFabiaAgente ? ', FabIA, Documento' : (isGrupoAlta ? ', Gestor, SESI' : '');
             const lines = [
                 '---',
-                `tags: [whatsapp, ${assunto}, ${prioridade}]`,
+                `tags: [whatsapp, ${assunto}, ${prioridade}${tagsExtra}]`,
                 `assunto: ${assunto}`,
                 `prioridade: ${prioridade}`,
                 `data: ${msg.received_at}`,
                 `contato: ${msg.push_name || 'desconhecido'}`,
             ];
             if (groupName) lines.push(`grupo: ${groupName}`);
+            if (isGrupoAlta) lines.push(`grupo_alta: true`);
+            if (isFabiaAgente) lines.push(`fabia_agente: true`);
             if (msg.media_filename) lines.push(`arquivo: ${msg.media_filename}`);
             lines.push('---', '## Mensagem', content);
             if (mediaRef) lines.push(mediaRef);
 
             fs.writeFileSync(file, lines.join('\n'), 'utf8');
 
-            const flag = urgente ? '[URGENTE] ' : (assunto === 'SESI' || assunto === 'Senai' ? `[${assunto}] ` : '[MSG] ');
+            const flag = isFabiaAgente ? '[FabIA] ' : (urgente ? '[URGENTE] ' : (assunto === 'SESI' || assunto === 'Senai' ? `[${assunto}] ` : '[MSG] '));
             log(`${flag}${dateStr} ${timeStr} [${groupName || dirName}] ${msg.push_name || '?'} (${assunto}/${prioridade}): ${String(content).substring(0, 80)}`);
+            if ((msg.push_name || '').toLowerCase().includes('zapia') && !isFabiaAgente) {
+                log(`[DIAG-JID] ZapIA remote_jid="${jid}" — esperado="${FABIA_AGENTE_JID}" — MATCH=${jid === FABIA_AGENTE_JID}`);
+            }
             criados++;
             idsProcessados.push(msg.id);
 
@@ -375,11 +453,14 @@ async function processLote(messages, config) {
 // ─── Loop principal ───────────────────────────────────────────────────────────
 (async () => {
     const config = loadConfig();
+    // Merge JIDs VIP do arquivo de configuração no set hardcoded
+    for (const jid of config.jidsVipExtra) JIDS_VIP_SESI.add(jid);
+
     const gruposCount  = Object.keys(config.grupos).length;
     const diretosCount = Object.keys(config.diretos).length;
 
     log(`=== FabIA Sync iniciado ===`);
-    log(`Config: ${gruposCount} grupos | ${diretosCount} diretos | ${config.altaSet.size} ALTA | ${config.propioSet.size} propios`);
+    log(`Config: ${gruposCount} grupos | ${diretosCount} diretos | ${JIDS_VIP_SESI.size} VIP | ${config.altaSet.size} ALTA | ${config.gruposAltaNomes.size} grupos-ALTA | ${config.jidsSesiSet.size} JIDs-SESI | ${config.contatosSesiSet.size} contatos-SESI | ${config.propioSet.size} propios`);
 
     let totalCriados = 0, totalPulados = 0, totalMidias = 0, totalDeletados = 0;
     let ciclo = 0;
