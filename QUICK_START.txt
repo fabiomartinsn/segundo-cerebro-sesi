@@ -1,0 +1,131 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    FabIA-GMAIL-SYNC v2.0 - QUICK START                   ║
+║                                                                            ║
+║  Sincronização automática de PDFs do Gmail SESI a cada 60 minutos         ║
+║  Gmail: fabiomartinsn@gmail.com → D:\segundo-cerebro\vault\...\email\    ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ PASSO 1: PREPARAÇÃO (1 minuto)                                             │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  1. Copie para D:\segundo-cerebro\:                                       │
+│     • FabIA-Sync-Gmail.bat                                               │
+│     • fabia-sync.ps1                                                     │
+│                                                                            │
+│  2. Crie pasta (se não existir):                                          │
+│     • D:\segundo-cerebro\vault\_knowledge\sesi\email\                   │
+│     • D:\segundo-cerebro\logs\                                           │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ PASSO 2: CONFIGURAR PROMPT /sync-gmail (5 minutos)                        │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  1. Abra: PROMPT_SYNC_GMAIL_INSTRUCOES.md                                │
+│  2. Copie o conteúdo do prompt                                           │
+│  3. Configure em seu Claude (Desktop/API/Web)                            │
+│  4. Nome: /sync-gmail                                                    │
+│                                                                            │
+│  NOTA: O prompt acessa fabiomartinsn@gmail.com                           │
+│        Se precisar OAuth2, crie em:                                      │
+│        https://console.developers.google.com                            │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ PASSO 3: TESTE MANUAL (5 minutos)                                         │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  Abra Command Prompt (cmd.exe) e execute:                                │
+│                                                                            │
+│  D:\segundo-cerebro\FabIA-Sync-Gmail.bat                                │
+│                                                                            │
+│  Deve mostrar:                                                            │
+│  ✓ [1/4] Sincronizando PDFs do Gmail                                    │
+│  ✓ [2/4] Indexando PDFs locais                                          │
+│  ✓ [3/4] Sincronizando repositório Git                                  │
+│                                                                            │
+│  Após terminar, verifique:                                               │
+│  • Pasta: D:\segundo-cerebro\vault\_knowledge\sesi\email\               │
+│    Devem ter PDFs com padrão: [SESI]_[Depto]_[Tipo]_YYYYMMDD.pdf       │
+│  • Log: D:\segundo-cerebro\logs\FabIA-Gmail-Sync.log                   │
+│  • Git: git log --grep="Gmail Sync" --oneline                          │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ PASSO 4: AGENDAR NO WINDOWS (3 minutos)                                   │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  1. Abra: taskschd.msc (Task Scheduler)                                   │
+│  2. Criar Tarefa Básica                                                   │
+│  3. Preencha:                                                             │
+│     Nome: FabIA-Gmail-Sync                                              │
+│     Descrição: Sync automático Gmail SESI a cada 60 min                │
+│  4. Gatilho:                                                              │
+│     ✓ Ao iniciar do computador (RECOMENDADO)                           │
+│     OU                                                                    │
+│     ✓ Diariamente às 08:00                                             │
+│  5. Ação:                                                                 │
+│     Programa: D:\segundo-cerebro\FabIA-Sync-Gmail.bat                 │
+│     Iniciar em: D:\segundo-cerebro                                     │
+│  6. OK → Pronto!                                                         │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+┌────────────────────────────────────────────────────────────────────────────┐
+│ MONITORAMENTO (Contínuo)                                                   │
+├────────────────────────────────────────────────────────────────────────────┤
+│                                                                            │
+│  Ver log de sincronizações:                                              │
+│  > type D:\segundo-cerebro\logs\FabIA-Gmail-Sync.log                    │
+│                                                                            │
+│  Contar PDFs sincronizados:                                              │
+│  > dir D:\segundo-cerebro\vault\_knowledge\sesi\email\ /B | find /c /v │
+│                                                                            │
+│  Ver commits Git:                                                         │
+│  > cd D:\segundo-cerebro && git log --oneline | grep Gmail              │
+│                                                                            │
+│  Próximo ciclo em:                                                        │
+│  → 60 minutos (automático)                                               │
+│                                                                            │
+└────────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════╗
+║                           🎯 CHECKLIST FINAL                              ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+  ☐ Arquivos copiados (FabIA-Sync-Gmail.bat + fabia-sync.ps1)
+  ☐ Pastas criadas (email + logs)
+  ☐ Prompt /sync-gmail configurado
+  ☐ Git configurado (user.name, user.email, remoto)
+  ☐ Teste manual executado
+  ☐ PDFs aparecem em vault\_knowledge\sesi\email\
+  ☐ Log criado em logs\FabIA-Gmail-Sync.log
+  ☐ Commit Git com "Gmail Sync" visível
+  ☐ Task Scheduler agendado
+  ☐ Primeira sincronização automática OK (aguardar 60 min)
+
+════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTAÇÃO COMPLETA DISPONÍVEL:
+
+  • CHECKLIST_IMPLEMENTACAO.md  ← Roteiro detalhado (6 etapas)
+  • README_GMAIL_SYNC.md        ← Resumo executivo
+  • PROMPT_SYNC_GMAIL_INSTRUCOES.md ← Config do prompt
+  
+🆘 PROBLEMAS?
+
+  Se algo não funcionar:
+  1. Verifique: logs\FabIA-Gmail-Sync.log
+  2. Teste: claude -p "/sync-gmail" (manual)
+  3. Consulte: CHECKLIST_IMPLEMENTACAO.md (Troubleshooting)
+
+════════════════════════════════════════════════════════════════════════════
+
+Status: ✅ PRONTO PARA PRODUÇÃO
+Versão: 2.0
+Data: 20/09/2026
+

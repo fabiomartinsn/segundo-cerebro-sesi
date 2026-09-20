@@ -9,6 +9,7 @@ Gere o briefing completo do dia seguindo rigorosamente a estrutura abaixo.
 - Os 3 arquivos mais recentes de `vault/_sessions/`
 - Os 3 arquivos mais recentes de `vault/_decisions/`
 - `vault/_knowledge/SESI/Planejamento/grade-semanal-sst-cruzamento.md`
+- `vault/Email/_INDEX.md` (emails SESI sincronizados)
 
 Use apenas dados reais dos arquivos. Se uma pasta estiver vazia, escreva "Nenhum registro ainda".
 
@@ -74,6 +75,24 @@ Qualquer mensagem dos contatos VIP ou do grupo crítico deve aparecer em destaqu
 
 ---
 
+## Leitura dos emails SESI
+
+Leia os arquivos `.md` em `vault/Email/SESI/` com campo `data` de hoje (frontmatter).
+
+Para cada email encontrado:
+1. Extraia `prioridade`, `remetente`, `email_remetente`, `subject`, `data` do frontmatter.
+2. Leia a seção `## Ação Sugerida` para o resumo de 1 linha.
+3. Classifique por prioridade: Urgente → Prioridade → Normal.
+
+Formato de cada linha no briefing: `{emoji} {HH:mm} {remetente}: {subject} — {ação sugerida}`
+Emojis: Urgente = 🔴 · Prioridade = 🟡 · Normal = ⬜
+
+Emails com `prioridade: Urgente` devem aparecer também em **⚠️ Alertas Gerais**.
+
+Se a pasta estiver vazia ou sem arquivos de hoje: escrever "Nenhum email SESI hoje — rodar `/sync-gmail` se necessário."
+
+---
+
 Gere o briefing com exatamente este formato:
 
 ```
@@ -130,6 +149,14 @@ Gere o briefing com exatamente este formato:
 
 ### Decisões Pendentes (WhatsApp)
 [itens com prioridade Urgente ou Prioridade que claramente pedem resposta/decisão sua, com contato e assunto — ou "Nenhuma pendência"]
+
+---
+
+## 📧 Email SESI — Hoje
+[🔴 HH:mm Remetente: Assunto — ação sugerida — se Urgente]
+[🟡 HH:mm Remetente: Assunto — ação sugerida — se Prioridade]
+[⬜ HH:mm Remetente: Assunto — se Normal]
+[ou "Nenhum email SESI hoje — rodar /sync-gmail se necessário"]
 
 ---
 

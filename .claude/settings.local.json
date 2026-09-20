@@ -301,7 +301,32 @@
       "PowerShell(Get-ChildItem \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\" -Recurse | Where-Object { $_.Name -match \"ilene\" } | Select-Object FullName, LastWriteTime)",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\fabio\\\\Documents\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\" -Recurse | Where-Object { $_.LastWriteTime -gt \\(Get-Date\\).AddHours\\(-3\\) } | Select-Object FullName, LastWriteTime | Format-Table -AutoSize)",
       "Bash(Measure-Object -Line)",
-      "PowerShell(Get-Content *)"
+      "PowerShell(Get-Content *)",
+      "PowerShell(cmd /c \"dir /b /s D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp 2>&1\" | Select-Object -First 40)",
+      "PowerShell($json = Get-Content \"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\.sync-control.json\" -Raw | ConvertFrom-Json; $json | Get-Member -MemberType NoteProperty | Select-Object -Last 10 | ForEach-Object { $name = $_.Name; \"$name = $\\($json.$name\\)\" })",
+      "PowerShell(cmd /c \"dir D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos /b\" 2>&1 | Select-Object -Last 20)",
+      "PowerShell(cmd /c \"dir \"\"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos\\\\Sidnei Ribeiro\"\" /b /o-d\" 2>&1 | Select-Object -First 5; cmd /c \"dir \"\"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos\\\\Glauber Hayzo\"\" /b /o-d\" 2>&1 | Select-Object -First 5; cmd /c \"dir \"\"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos\\\\Neto Rodrigues \"\" /b /o-d\" 2>&1 | Select-Object -First 5)",
+      "PowerShell(cmd /c \"dir \"\"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos\\\\ Ana Cláudia \"\" /b /o-d\" 2>&1 | Select-Object -First 5)",
+      "PowerShell($folder = \"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos\\\\ Ana Cláudia \"; cmd /c \"dir \"\"$folder\"\" /b /o-d 2>&1\" | Select-Object -First 5)",
+      "PowerShell(cmd /c \"dir \"\"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos\\\\ZapIA\"\" /b /o-d\" 2>&1 | Select-Object -First 10)",
+      "PowerShell(cmd /c \"dir \"\"D:\\\\segundo-cerebro\\\\vault\\\\WhatsApp\\\\diretos\\\\desconhecido\"\" /b /o-d\" 2>&1 | Select-Object -First 5)",
+      "Bash(pip3 show *)",
+      "Bash(grep \"\\\\.md$\")",
+      "Bash(xargs ls -t)",
+      "Bash(xargs grep -l \"assunto: SESI\\\\|assunto:SESI\\\\|Urgente\\\\|Prioridade\")",
+      "mcp__claude_ai_Google_Calendar__create_event",
+      "PowerShell(Start-Process \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\\\\Indicadores\\\\mapa-mental-indicadores-2527.html\")",
+      "mcp__claude_ai_Gmail__search_threads",
+      "mcp__claude_ai_Gmail__get_thread",
+      "Bash(schtasks *)",
+      "PowerShell(schtasks *)",
+      "WebFetch(domain:portfoliosesi.sti-ia.org)",
+      "Bash(Start-Process *)",
+      "PowerShell(Start-Process \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\\\\Palestras\\\\Proposta_Canal_IndSE_em_Pauta.docx\")",
+      "Bash(npm root *)",
+      "PowerShell(Start-Process \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\\\\+ integração GRM\\\\REl Indicador\\\\dashboard-indicador73.html\")",
+      "Bash(pip show *)",
+      "Bash(ssh *)"
     ]
   }
 }
