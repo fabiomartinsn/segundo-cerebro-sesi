@@ -326,7 +326,11 @@
       "Bash(npm root *)",
       "PowerShell(Start-Process \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\\\\+ integração GRM\\\\REl Indicador\\\\dashboard-indicador73.html\")",
       "Bash(pip show *)",
-      "Bash(ssh *)"
+      "Bash(ssh *)",
+      "Bash(Select-Object Name, Extension, Length)",
+      "PowerShell(Get-ChildItem \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\\\\+ Integração GRM\" | Select-Object Name, Extension, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}} | Format-Table -AutoSize)",
+      "PowerShell(Get-ChildItem \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\\\\+ Integração GRM\" | Where-Object { $_.Extension -in @\\('.jpeg','.jpg','.png'\\) -and $_.LastWriteTime -gt \\(Get-Date\\).AddHours\\(-2\\) } | Select-Object Name, LastWriteTime)",
+      "PowerShell(Get-ChildItem \"D:\\\\segundo-cerebro\\\\vault\\\\_knowledge\\\\SESI\\\\+ Integração GRM\" | Where-Object { $_.Extension -in @\\('.jpeg','.jpg','.png'\\) } | Sort-Object LastWriteTime -Descending | Select-Object Name, LastWriteTime | Select-Object -First 10)"
     ]
   }
 }
